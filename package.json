@@ -1,0 +1,23 @@
+{
+  "name": "wejapa-internship-notesapp",
+  "version": "1.0.0",
+  "description": "WeJapa Internship first project of building a Notes App using only node js",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "internship",
+    "node",
+    "js",
+    "notes",
+    "app",
+    "wejapa"
+  ],
+  "author": "Chidi Bede",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^3.5.9",
+    "mongoose": "^5.9.26"
+  }
+}
