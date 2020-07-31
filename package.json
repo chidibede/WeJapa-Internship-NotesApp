@@ -4,7 +4,9 @@
   "description": "WeJapa Internship first project of building a Notes App using only node js",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [
     "internship",
@@ -17,6 +19,7 @@
   "author": "Chidi Bede",
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^8.2.0",
     "mongodb": "^3.5.9",
     "mongoose": "^5.9.26"
   }
