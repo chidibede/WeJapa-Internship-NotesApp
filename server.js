@@ -94,6 +94,76 @@ const server = http.createServer(async (req, res) => {
         res.end();
       }
       break;
+    
+    case "PUT":
+      if (urlpath === "/") {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.write(JSON.stringify({ greeting: "Hello world" }));
+        res.end();
+      } else {
+        let noteIdPattern = "[a-zA-Z0-9]+";
+        let pattern = new RegExp("/notes/" + noteIdPattern);
+        if (pattern.test(urlpath)) {
+          pattern = new RegExp(noteIdPattern);
+          let noteIdObj = pattern.exec(urlpath);
+          let id = noteIdObj.input.split("/")[2];
+          let filter = {_id: id}
+          let body = "";
+          req.on("data", (chunk) => {
+            body += chunk;
+          });
+
+          req.on("end", async () => {
+              let update = JSON.parse(body);
+              await Note.findOneAndUpdate(filter, update, {useFindAndModify: false}, (error, data) => {
+                if (error) {
+                  console.log("Error creating note", error);
+                } else {
+                  let response = {
+                    updatedData: update,
+                    oldData: data
+                  };
+                  res.writeHead(200, { "content-type": "application/json" });
+                  res.write(JSON.stringify(response));
+                  res.end();
+                }
+              });
+           
+          });
+        }
+      }
+      break;
+    
+    case "DELETE":
+      if (urlpath === "/") {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.write(JSON.stringify({ greeting: "Hello world" }));
+        res.end();
+      } else {
+        let noteIdPattern = "[a-zA-Z0-9]+";
+        let pattern = new RegExp("/notes/" + noteIdPattern);
+        if (pattern.test(urlpath)) {
+          pattern = new RegExp(noteIdPattern);
+          let noteIdObj = pattern.exec(urlpath);
+          let id = noteIdObj.input.split("/")[2];
+
+          await Note.findByIdAndDelete(id, (error, data) => {
+            if (error) {
+              console.log("Error creating note", error);
+            } else {
+              let response = {
+                message: "Deleted Successfully",
+                oldData: data
+              };
+              res.writeHead(200, { "content-type": "application/json" });
+              res.write(JSON.stringify(response));
+              res.end();
+            }
+          });
+    
+        }
+      }
+      break;
     default:
       break;
   }
