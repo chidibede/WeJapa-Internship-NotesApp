@@ -4,6 +4,7 @@ require("dotenv").config();
 const url = require("url");
 const fs = require("fs");
 const requests = require('./controllers/notesController')
+const update_requests = require('./controllers/updateNotesController')
 const Note = require("./models/notes");
 
 mongoose.connect(
@@ -254,52 +255,7 @@ const server = http.createServer(async (req, res) => {
         );
         res.end();
       } else if (urlpath === "/notes") {
-        let body = "";
-        req.on("data", (chunk) => {
-          body += chunk;
-        });
-
-        req.on("end", async () => {
-          let postBody = JSON.parse(body);
-          let notes = Note(postBody);
-          await notes.save((error, data) => {
-            if (error) {
-              console.log("Error creating note", error);
-            } else {
-              let response = {
-                data: data,
-              };
-              let noteTitle = data.title.replace(/\s+/g, "_");
-              console.log(noteTitle);
-              res.writeHead(200, { "content-type": "application/json" });
-              res.write(JSON.stringify(response));
-              res.end();
-
-              if (fs.existsSync("notes_folder")) {
-                fs.writeFile(
-                  "notes_folder/" + noteTitle + ".txt",
-                  data.content,
-                  (err) => {
-                    if (err) {
-                      console.log(err);
-                    }
-                  }
-                );
-              } else {
-                fs.mkdirSync("notes_folder");
-                fs.writeFile(
-                  "notes_folder/" + noteTitle + ".txt",
-                  data.content,
-                  (err) => {
-                    if (err) {
-                      console.log(err);
-                    }
-                  }
-                );
-              }
-            }
-          });
-        });
+        requests.createNote(req, res)
       } else {
         res.writeHead(401, { "content-type": "text/plain" });
         res.write(JSON.stringify({ error: "Invalid endpoint" }));
@@ -313,40 +269,7 @@ const server = http.createServer(async (req, res) => {
         res.write(JSON.stringify({ greeting: "Hello world" }));
         res.end();
       } else {
-        let noteIdPattern = "[a-zA-Z0-9]+";
-        let pattern = new RegExp("/notes/" + noteIdPattern);
-        if (pattern.test(urlpath)) {
-          pattern = new RegExp(noteIdPattern);
-          let noteIdObj = pattern.exec(urlpath);
-          let id = noteIdObj.input.split("/")[2];
-          let filter = { _id: id };
-          let body = "";
-          req.on("data", (chunk) => {
-            body += chunk;
-          });
-
-          req.on("end", async () => {
-            let update = JSON.parse(body);
-            await Note.findOneAndUpdate(
-              filter,
-              update,
-              { useFindAndModify: false },
-              (error, data) => {
-                if (error) {
-                  console.log("Error creating note", error);
-                } else {
-                  let response = {
-                    updatedData: update,
-                    oldData: data,
-                  };
-                  res.writeHead(200, { "content-type": "application/json" });
-                  res.write(JSON.stringify(response));
-                  res.end();
-                }
-              }
-            );
-          });
-        }
+        update_requests.updateNote(req, res)
       }
       break;
 
@@ -356,27 +279,7 @@ const server = http.createServer(async (req, res) => {
         res.write(JSON.stringify({ greeting: "Hello world" }));
         res.end();
       } else {
-        let noteIdPattern = "[a-zA-Z0-9]+";
-        let pattern = new RegExp("/notes/" + noteIdPattern);
-        if (pattern.test(urlpath)) {
-          pattern = new RegExp(noteIdPattern);
-          let noteIdObj = pattern.exec(urlpath);
-          let id = noteIdObj.input.split("/")[2];
-
-          await Note.findByIdAndDelete(id, (error, data) => {
-            if (error) {
-              console.log("Error creating note", error);
-            } else {
-              let response = {
-                message: "Deleted Successfully",
-                oldData: data,
-              };
-              res.writeHead(200, { "content-type": "application/json" });
-              res.write(JSON.stringify(response));
-              res.end();
-            }
-          });
-        }
+        update_requests.deleteNote(req, res)
       }
       break;
     default:
