@@ -1,10 +1,10 @@
 const http = require("http");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const Note = require("./models/notes");
 const url = require("url");
 const fs = require("fs");
-const notes = require("./models/notes");
+const requests = require('./controllers/notesController')
+const Note = require("./models/notes");
 
 mongoose.connect(
   process.env.MONGO_URI,
@@ -24,19 +24,9 @@ const server = http.createServer(async (req, res) => {
   switch (req.method) {
     case "GET":
       if (urlpath === "/") {
-        res.writeHead(200, { "content-type": "application/json" });
-        res.write(JSON.stringify({ greeting: "Hello world" }));
-        res.end();
+        requests.home(res)
       } else if (urlpath === "/notes" || urlpath === "/notes/") {
-        await Note.find({}, "-_id -__v", (error, data) => {
-          if (error) {
-            console.log("Error retrieving notes", error);
-          } else {
-            res.writeHead(200, { "content-type": "application/json" });
-            res.write(JSON.stringify(data));
-            res.end();
-          }
-        });
+        requests.allNotes(res)
       } else if (urlpath === "/notes/sortByCategories/Personal") {
         await Note.find( 
           { categories: urlpath.split("/")[3] },
@@ -252,22 +242,7 @@ const server = http.createServer(async (req, res) => {
           }
         );
       } else {
-        let noteIdPattern = "[a-zA-Z0-9]+";
-        let pattern = new RegExp("/notes/" + noteIdPattern);
-        if (pattern.test(urlpath)) {
-          pattern = new RegExp(noteIdPattern);
-          let noteIdObj = pattern.exec(urlpath);
-          let id = noteIdObj.input.split("/")[2];
-          await Note.findById(id, "-_id -__v", (error, data) => {
-            if (error) {
-              console.log("Error retrieving notes", error);
-            } else {
-              res.writeHead(200, { "content-type": "application/json" });
-              res.write(JSON.stringify(data));
-              res.end();
-            }
-          });
-        }
+        requests.oneNote(req, res)
       }
       break;
 
