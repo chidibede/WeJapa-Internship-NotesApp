@@ -4,6 +4,7 @@ require("dotenv").config();
 const Note = require("./models/notes");
 const url = require("url");
 const fs = require("fs");
+const notes = require("./models/notes");
 
 mongoose.connect(
   process.env.MONGO_URI,
@@ -27,7 +28,7 @@ const server = http.createServer(async (req, res) => {
         res.write(JSON.stringify({ greeting: "Hello world" }));
         res.end();
       } else if (urlpath === "/notes" || urlpath === "/notes/") {
-        await Note.find((error, data) => {
+        await Note.find({}, "-_id -__v", (error, data) => {
           if (error) {
             console.log("Error retrieving notes", error);
           } else {
@@ -37,8 +38,9 @@ const server = http.createServer(async (req, res) => {
           }
         });
       } else if (urlpath === "/notes/sortByCategories/Personal") {
-        await Note.find(
+        await Note.find( 
           { categories: urlpath.split("/")[3] },
+         "-_id -__v",
           (error, data) => {
             if (error) {
               console.log("Error retrieving notes", error);
@@ -85,9 +87,10 @@ const server = http.createServer(async (req, res) => {
             }
           }
         );
-      }  else if (urlpath === "/notes/sortByCategories/Study") {
+      } else if (urlpath === "/notes/sortByCategories/Study") {
         await Note.find(
           { categories: urlpath.split("/")[3] },
+          "-_id -__v",
           (error, data) => {
             if (error) {
               console.log("Error retrieving notes", error);
@@ -137,6 +140,7 @@ const server = http.createServer(async (req, res) => {
       } else if (urlpath === "/notes/sortByCategories/Work") {
         await Note.find(
           { categories: urlpath.split("/")[3] },
+          "-_id -__v",
           (error, data) => {
             if (error) {
               console.log("Error retrieving notes", error);
@@ -150,6 +154,7 @@ const server = http.createServer(async (req, res) => {
       } else if (urlpath === "/notes/sortByCategories/Work") {
         await Note.find(
           { categories: urlpath.split("/")[3] },
+          "-_id -__v",
           (error, data) => {
             if (error) {
               console.log("Error retrieving notes", error);
@@ -199,6 +204,7 @@ const server = http.createServer(async (req, res) => {
       } else if (urlpath === "/notes/sortByCategories/Others") {
         await Note.find(
           { categories: urlpath.split("/")[3] },
+          "-_id -__v",
           (error, data) => {
             if (error) {
               console.log("Error retrieving notes", error);
@@ -245,14 +251,14 @@ const server = http.createServer(async (req, res) => {
             }
           }
         );
-      }  else {
+      } else {
         let noteIdPattern = "[a-zA-Z0-9]+";
         let pattern = new RegExp("/notes/" + noteIdPattern);
         if (pattern.test(urlpath)) {
           pattern = new RegExp(noteIdPattern);
           let noteIdObj = pattern.exec(urlpath);
           let id = noteIdObj.input.split("/")[2];
-          await Note.findById(id, (error, data) => {
+          await Note.findById(id, "-_id -__v", (error, data) => {
             if (error) {
               console.log("Error retrieving notes", error);
             } else {
