@@ -8,6 +8,9 @@ const update_requests = require("./controllers/updateNotesController");
 const delete_requests = require("./controllers/deleteNotesController");
 const sort_notes = require("./controllers/sortNotes");
 const Note = require("./models/notes");
+const nodeStatic = require('node-static');
+
+let fileServer = new nodeStatic.Server('./public');
 
 mongoose.connect(
   process.env.MONGO_URI,
@@ -27,7 +30,8 @@ const server = http.createServer(async (req, res) => {
   switch (req.method) {
     case "GET":
       if (urlpath === "/") {
-        requests.home(res);
+        requests.home(req, res);
+        console.log(fileServer.root);
       } else if (urlpath === "/notes" || urlpath === "/notes/") {
         requests.allNotes(res);
       } else if (urlpath === "/notes/sortByCategories/Personal") {

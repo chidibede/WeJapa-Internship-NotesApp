@@ -20,7 +20,9 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",
+    "mime-types": "^2.1.27",
     "mongodb": "^3.5.9",
-    "mongoose": "^5.9.26"
+    "mongoose": "^5.9.26",
+    "node-static": "^0.7.11"
   }
 }
