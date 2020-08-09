@@ -12,13 +12,6 @@ module.exports = requests = {
     let parsedURL = url.parse(req.url, true);
     //remove the leading and trailing slashes
     let path = parsedURL.path.replace(/^\/+|\/+$/g, "");
-    /**
-     *  /
-     *  /index.html
-     *
-     *  /main.css
-     *  /main.js
-     */
     if (path == "") {
       path = "index.html";
     }
